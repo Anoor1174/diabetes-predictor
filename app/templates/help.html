@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Help & FAQs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="navbar">
+    <a href="/">Home</a>
+    <a href="/clinical">Clinical Assessment</a>
+    <a href="/advice">Healthy Living</a>
+    <a href="/help">Help & FAQs</a>
+</div>
+
+<div class="container">
+    <h1>Help & Frequently Asked Questions</h1>
+    <p>Find answers to common questions about how this tool works and what your results mean.</p>
+
+    <h2>About the Tool</h2>
+
+    <div class="faq-box">
+        <h3>Is this a medical diagnosis?</h3>
+        <p>No. This tool provides a statistical estimate of diabetes risk based on general clinical indicators. It is not a diagnosis.</p>
+    </div>
+
+    <div class="faq-box">
+        <h3>How does the tool calculate risk?</h3>
+        <p>The system uses a machine learning model trained on real health data, combined with simple clinical rules based on widely recognised health guidelines.</p>
+    </div>
+
+    <div class="faq-box">
+        <h3>Why does the tool ask for blood pressure and BMI?</h3>
+        <p>These are common indicators associated with diabetes risk and help the model estimate your likelihood more accurately.</p>
+    </div>
+
+    <h2>Understanding Your Results</h2>
+
+    <div class="faq-box">
+        <h3>What does “Low”, “Medium”, or “High” risk mean?</h3>
+        <p>These categories reflect the model’s estimate of your likelihood of having or developing diabetes. They are not diagnostic.</p>
+    </div>
+
+    <div class="faq-box">
+        <h3>What should I do if my risk is high?</h3>
+        <p>If you are concerned about your results, consider speaking to a healthcare professional for personalised advice.</p>
+    </div>
+
+    <div class="faq-box">
+        <h3>Why do I see “Clinical Rules Triggered”?</h3>
+        <p>Some health indicators, such as very high blood pressure or BMI, are known risk factors. When these appear, the system highlights them for transparency.</p>
+    </div>
+
+    <h2>Data & Privacy</h2>
+
+    <div class="faq-box">
+        <h3>Is my data stored?</h3>
+        <p>This prototype does not store personal data. It processes your inputs temporarily to generate a risk estimate.</p>
+    </div>
+
+    <div class="faq-box">
+        <h3>How is my information used?</h3>
+        <p>Your inputs are used only to calculate your risk score. No personal information is saved or shared.</p>
+    </div>
+
+</div>
+
+
+</body>
+</html>

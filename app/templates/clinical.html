@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinical Diabetes Risk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <a href="/">Home</a>
+    <a href="/clinical">Clinical Assessment</a>
+    <a href="/advice">Healthy Living</a>
+    <a href="/help">Help & FAQs</a>
+</div>
+
+<div class="container">
+    <h1>Clinical Diabetes Risk Estimator</h1>
+
+    <div class="form-grid">
+<label>Age</label>
+<input type="number" id="age" required>
+
+<label>Gender</label>
+<select id="sex" required>
+    <option value="" disabled selected>Select gender</option>
+    <option value="0">Female</option>
+    <option value="1">Male</option>
+</select>
+
+<label>Ethnicity</label>
+<select id="ethnicity" required>
+    <option value="" disabled selected>Select ethnicity</option>
+    <option value="0">White</option>
+    <option value="1">Asian</option>
+    <option value="2">Black</option>
+    <option value="3">Mixed</option>
+    <option value="4">Other</option>
+</select>
+
+
+<label>BMI</label>
+<input type="number" id="bmi" required>
+
+<label>Systolic BP</label>
+<input type="number" id="sbp" required>
+
+<label>Diastolic BP</label>
+<input type="number" id="dbp" required>
+
+    </div>
+
+    <button id="predict-btn">Estimate Risk</button>
+
+
+<div id="clinical-result" class="result-box"></div>
+
+<script src="{{ url_for('static', filename='clinical.js') }}"></script>
+</body>
+</html>
+
+
+
+
