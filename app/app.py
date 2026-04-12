@@ -3,17 +3,19 @@ import joblib
 import numpy as np
 import os
 
-#initialises flas
+# NEW IMPORTS FOR FAIRNESS + OPTIMISATION
+from threshold_optimisation import evaluate_at_threshold, sweep_thresholds
+from pareto_frontier import compute_pareto_frontier
+
+# Initialise Flask
 app = Flask(__name__)
 
-#path to the folder where the trained model + scaler are stored
-MODEL_DIR = os.path.join("app", "models")
+# Path to model directory
+MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
 
-#load the trained clinical model and its scaler into memory
+# Load trained model + scaler
 clinical_model = joblib.load(os.path.join(MODEL_DIR, "clinical_model.pkl"))
 clinical_scaler = joblib.load(os.path.join(MODEL_DIR, "clinical_scaler.pkl"))
-
-
 
 
 def risk_category(prob):
@@ -28,7 +30,6 @@ def risk_category(prob):
 
 def rule_based_adjustments(data, ml_prediction):
     rules_triggered = []
-
 
     if data["Age"] >= 70 and data["BMI"] >= 30:
         ml_prediction = 1
@@ -47,7 +48,7 @@ def rule_based_adjustments(data, ml_prediction):
 
 @app.route("/api/predict_clinical", methods=["POST"])
 def predict_clinical_api():
-    data = request.json  #extract JSON sent from the frontend
+    data = request.json
 
     try:
         age = float(data.get("Age", 0))
@@ -57,7 +58,7 @@ def predict_clinical_api():
         sbp = float(data.get("SystolicBP", 0))
         dbp = float(data.get("DiastolicBP", 0))
 
-        #basic clinical validation ranges
+        # Basic validation
         if not (0 <= age <= 120):
             return jsonify({"error": "Age must be 0-120"}), 400
         if not (10 <= bmi <= 80):
@@ -70,7 +71,7 @@ def predict_clinical_api():
     except (ValueError, TypeError):
         return jsonify({"error": "Invalid input data"}), 400
 
-
+    # Prepare features for model
     features = np.array([
         data["SystolicBP"],
         data["DiastolicBP"],
@@ -82,20 +83,22 @@ def predict_clinical_api():
 
     scaled = clinical_scaler.transform(features)
 
-    #predicts probability of diabetes using the ML model
+    # ML probability
     ml_prob = clinical_model.predict_proba(scaled)[0][1]
 
-    #convert probability into a binary prediction using threshold 0.15
+    # Default threshold
     ml_pred = 1 if ml_prob > 0.15 else 0
+
+    # Apply rule-based overrides
     final_pred, rules = rule_based_adjustments(data, ml_pred)
 
-    #combines ML probability with rule adjustments
+    # Combine ML + rules
     combined_score = ml_prob
     if len(rules) > 0:
         combined_score = min(1.0, ml_prob + 0.20)
+
     category = risk_category(combined_score)
 
-    #return the prediction back to the frontend
     return jsonify({
         "ml_probability": float(ml_prob),
         "final_probability": float(combined_score),
@@ -106,25 +109,113 @@ def predict_clinical_api():
 
 
 
+# 1. Metrics at a specific threshold
+@app.route("/api/fairness_metrics", methods=["GET"])
+def fairness_metrics():
+    threshold = float(request.args.get("threshold", 0.5))
+    results = evaluate_at_threshold(threshold)
+    return jsonify(results)
+
+
+# 2. Sweep thresholds (0.05 → 0.50)
+@app.route("/api/threshold_sweep", methods=["GET"])
+def threshold_sweep():
+    results = sweep_thresholds()
+    return jsonify(results)
+
+
+# 3. Pareto frontier
+@app.route("/api/pareto_frontier", methods=["GET"])
+def pareto_frontier_api():
+    results = sweep_thresholds()
+    all_points, pareto_frontier = compute_pareto_frontier(results)
+
+    return jsonify({
+        "all_points": all_points.to_dict(orient="records"),
+        "pareto_frontier": pareto_frontier.to_dict(orient="records")
+    })
+
+@app.route("/predict_clinical", methods=["POST"])
+def predict_clinical():
+    # 1. Get form values
+    age = float(request.form.get("age"))
+    bmi = float(request.form.get("bmi"))
+    glucose = float(request.form.get("glucose"))
+    # ... add the rest of your inputs
+
+    # 2. Prepare input for model
+    input_data = [[age, bmi, glucose]]  # example
+
+    # 3. Load model + scaler
+    model = pickle.load(open("clinical_model.pkl", "rb"))
+    scaler = pickle.load(open("clinical_scaler.pkl", "rb"))
+
+    scaled = scaler.transform(input_data)
+    prob = model.predict_proba(scaled)[0][1]
+
+    # 4. Convert probability → label
+    if prob >= 0.5:
+        label = "High Risk"
+        explanation = "Your results indicate a high likelihood of Type 2 diabetes. Please consider contacting a GP for further testing."
+    elif prob >= 0.25:
+        label = "Moderate Risk"
+        explanation = "Your results suggest a moderate risk. Lifestyle changes can significantly reduce your risk."
+    else:
+        label = "Low Risk"
+        explanation = "Your results indicate a low risk. Continue maintaining healthy habits."
+
+    # 5. Redirect to results page
+    return redirect(url_for(
+        "results_page",
+        risk_score=round(prob, 2),
+        risk_label=label,
+        explanation=explanation
+    ))
+
+
 @app.route("/")
 def home():
     return render_template("home.html")
-
 
 @app.route("/clinical")
 def clinical_page():
     return render_template("clinical.html")
 
+@app.route("/lifestyle")
+def lifestyle_page():
+    return render_template("lifestyle.html")
 
 @app.route("/advice")
 def advice_page():
     return render_template("advice.html")
 
-
 @app.route("/help")
 def help_page():
     return render_template("help.html")
 
+@app.route("/dashboard")
+def dashboard_page():
+    return render_template("dashboard.html")
+
+@app.route("/diabetesinfo")
+def diabetesinfo_page():
+    return render_template("diabetes_information.html")
+
+@app.route("/result")
+def result_page():
+    risk_score = request.args.get("risk_score", None)
+    risk_label = request.args.get("risk_label", None)
+    explanation = request.args.get("explanation", None)
+    return render_template("" \
+    "result.html",
+    risk_score=risk_score,
+    risk_label=risk_label,
+    explanation=explanation
+    )
+
+@app.route("/insights")
+def insights_page():
+    return render_template("insights.html")
 
 
 if __name__ == "__main__":

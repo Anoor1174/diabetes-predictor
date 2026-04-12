@@ -7,11 +7,14 @@
 <body>
 
 <div class="navbar">
-    <div class="nav-left">
-        <a href="/">Home</a>
-        <a href="/lifestyle">Lifestyle Assessment</a>
-        <a href="/clinical">Clinical Assessment</a>
-    </div>
+    <a href="/">Home</a>
+    <a href="/diabetesinfo">Diabetes Information</a>
+    <a href="/insights">Insights From Data</a>
+    <a href="/lifestyle">Lifestyle Risk Path</a>
+    <a href="/clinical">Clinical Risk Path</a>
+    <a href="/result">Your Results</a>
+    <a href="/dashboard">view your dashboard</a>
+    <a href="/help">Help & Contact</a>
 </div>
 
 <div class="container"> 
@@ -27,6 +30,30 @@
     <br>
     <a href="/">Back to Home</a>
 </div>
+
+<div class="info-card">
+    <h2>Your Diabetes Risk Result</h2>
+
+    <div class="result-box">
+        <strong>Risk Score:</strong> {{ risk_score }}<br>
+        <strong>Category:</strong> {{ risk_label }}
+    </div>
+
+    <h3>What This Means</h3>
+    <p>{{ explanation }}</p>
+
+    <h3>Next Steps</h3>
+    <ul>
+        <li>If high risk → book a GP appointment.</li>
+        <li>If moderate risk → lifestyle changes recommended.</li>
+        <li>If low risk → continue healthy habits.</li>
+    </ul>
+
+    <a href="/advice">
+        <button class="btn-primary">View Personalised Advice</button>
+    </a>
+</div>
+
 
 </body>
 </html>

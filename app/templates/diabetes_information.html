@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Diabetes Information</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="navbar">
+    <a href="/">Home</a>
+    <a href="/diabetesinfo">Diabetes Information</a>
+    <a href="/insights">Insights From Data</a>
+    <a href="/lifestyle">Lifestyle Risk Path</a>
+    <a href="/clinical">Clinical Risk Path</a>
+    <a href="/result">Your Results</a>
+    <a href="/dashboard">view your dashboard</a>
+    <a href="/help">Help & Contact</a>
+</div>
+
+
+    <div class="container">
+
+        <section class="info-card">
+            <h2>How Type 2 Diabetes Affects Health</h2>
+            <p class="section-intro">
+                Type 2 Diabetes Mellitus (T2DM) affects multiple systems in the body and often develops silently over several years.
+            </p>
+
+            <ul>
+                <li><strong>Blood Sugar Regulation:</strong> Persistent high glucose damages blood vessels and nerves.</li>
+                <li><strong>Cardiovascular Health:</strong> Increased risk of heart attack, stroke, and hypertension.</li>
+                <li><strong>Kidney Function:</strong> Long-term strain can lead to chronic kidney disease.</li>
+                <li><strong>Nerve Damage:</strong> Peripheral neuropathy causes pain, numbness, and foot complications.</li>
+                <li><strong>Vision:</strong> High glucose can damage retinal blood vessels, leading to diabetic retinopathy.</li>
+            </ul>
+
+            <p class="source-note">Based on information from: NHS & World Health Organization (WHO)</p>
+        </section>
+
+        <section class="info-card">
+            <h2>Evidence-Based Management Tips</h2>
+            <p class="section-intro">
+                Small, consistent lifestyle changes can significantly reduce the risk of developing or worsening Type 2 diabetes.
+            </p>
+
+            <ul>
+                <li><strong>Regular Activity:</strong> Aim for at least 150 minutes of moderate exercise per week.</li>
+                <li><strong>Balanced Nutrition:</strong> Prioritise whole grains, vegetables, lean protein, and healthy fats.</li>
+                <li><strong>Weight Management:</strong> Even a 5–7% weight reduction can lower risk.</li>
+                <li><strong>Sleep & Stress:</strong> Good sleep and stress management support metabolic health.</li>
+                <li><strong>Routine Check-ups:</strong> Regular blood tests help detect changes early.</li>
+            </ul>
+        </section>
+
+        <section class="info-card">
+            <h2>Find Healthy Food Options Near You</h2>
+            <p class="section-intro">
+                Use your location to find healthy restaurants, organic markets, and fresh produce stores.
+            </p>
+
+            <button class="btn-primary" onclick="findHealthyFood()">Find Healthy Options</button>
+
+            <div id="map"></div>
+        </section>
+
+
+    </div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA95StKR4UNuJYFDZ2-qtjZ3eFYtTIQdm8&libraries=places&callback=initMap" async defer></script>
+<script src="{{ url_for('static', filename='maps.js') }}"></script>
+
+</body>
+</html>

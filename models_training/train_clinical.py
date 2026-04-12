@@ -99,3 +99,5 @@ if __name__ == "__main__":
     trainer = ClinicalModelTrainer(config)
     trainer.train()
     trainer.save()
+
+    
