@@ -5,7 +5,7 @@ import os
 
 # NEW IMPORTS FOR FAIRNESS + OPTIMISATION
 from threshold_optimisation import evaluate_at_threshold, sweep_thresholds
-from pareto_frontier import compute_pareto_frontier
+from performance_fairness_comparison import compute_performance_fairness_comparison
 
 # Initialise Flask
 app = Flask(__name__)
@@ -124,16 +124,20 @@ def threshold_sweep():
     return jsonify(results)
 
 
-# 3. Pareto frontier
-@app.route("/api/pareto_frontier", methods=["GET"])
-def pareto_frontier_api():
-    results = sweep_thresholds()
-    all_points, pareto_frontier = compute_pareto_frontier(results)
+# 3. comparison of performance and fairness
+@app.route("/api/performance_fairness_comparison", methods=["GET"])
+def performance_fairness_comparison_api():
+    # Define thresholds to sweep (0.01 → 0.99)
+    thresholds = [i/100 for i in range(1, 100)]
+
+    # Compute performance vs fairness comparison
+    all_points, frontier = compute_performance_fairness_comparison(thresholds)
 
     return jsonify({
         "all_points": all_points.to_dict(orient="records"),
-        "pareto_frontier": pareto_frontier.to_dict(orient="records")
+        "performance_fairness_comparison": frontier.to_dict(orient="records")
     })
+
 
 @app.route("/predict_clinical", methods=["POST"])
 def predict_clinical():
@@ -202,16 +206,17 @@ def diabetesinfo_page():
     return render_template("diabetes_information.html")
 
 @app.route("/result")
-def result_page():
+def results_page():
     risk_score = request.args.get("risk_score", None)
     risk_label = request.args.get("risk_label", None)
     explanation = request.args.get("explanation", None)
-    return render_template("" \
+    return render_template(
     "result.html",
     risk_score=risk_score,
     risk_label=risk_label,
     explanation=explanation
-    )
+)
+
 
 @app.route("/insights")
 def insights_page():
