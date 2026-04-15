@@ -1,18 +1,3 @@
-"""
-Author: Azhaar Noor
-Date: 2026-04-15
-Description:
-    Trains the deployed XGBoost clinical risk model on NHANES data.
-
-    Model selection:
-    Logistic Regression, Random Forest, and XGBoost were compared in
-    models_training/train_model_comparison.py. XGBoost was chosen as the
-    production model because it achieved the highest recall at the
-    screening threshold (0.15) while maintaining strong AUC and acceptable
-    accuracy. For a diabetes screening tool, maximising recall (reducing
-    false negatives) is clinically more important than marginal gains in
-    overall accuracy, which justifies deploying XGBoost.
-"""
 
 import os
 from dataclasses import dataclass

@@ -1,11 +1,3 @@
-"""
-Author: Azhaar Noor
-Date: 2026-04-15
-Description:
-    Compare Logistic Regression, Random Forest, and XGBoost on the
-    NHANES clinical dataset and write results to model_comparison_results.csv.
-"""
-
 import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
