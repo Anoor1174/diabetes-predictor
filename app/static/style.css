@@ -198,3 +198,14 @@ button:hover {
     height: 400px;
     width: 100%;
 }
+
+.insight-list {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+.insight-list li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}

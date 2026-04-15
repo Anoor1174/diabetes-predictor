@@ -119,9 +119,9 @@ def fairness_metrics():
 
 # 2. Sweep thresholds (0.05 → 0.50)
 @app.route("/api/threshold_sweep", methods=["GET"])
-def threshold_sweep():
-    results = sweep_thresholds()
-    return jsonify(results)
+def sweep_thresholds(thresholds=None):
+    if thresholds is None:
+        thresholds = [i/100 for i in range(1, 100)]
 
 
 # 3. comparison of performance and fairness
@@ -137,44 +137,6 @@ def performance_fairness_comparison_api():
         "all_points": all_points.to_dict(orient="records"),
         "performance_fairness_comparison": frontier.to_dict(orient="records")
     })
-
-
-@app.route("/predict_clinical", methods=["POST"])
-def predict_clinical():
-    # 1. Get form values
-    age = float(request.form.get("age"))
-    bmi = float(request.form.get("bmi"))
-    glucose = float(request.form.get("glucose"))
-    # ... add the rest of your inputs
-
-    # 2. Prepare input for model
-    input_data = [[age, bmi, glucose]]  # example
-
-    # 3. Load model + scaler
-    model = pickle.load(open("clinical_model.pkl", "rb"))
-    scaler = pickle.load(open("clinical_scaler.pkl", "rb"))
-
-    scaled = scaler.transform(input_data)
-    prob = model.predict_proba(scaled)[0][1]
-
-    # 4. Convert probability → label
-    if prob >= 0.5:
-        label = "High Risk"
-        explanation = "Your results indicate a high likelihood of Type 2 diabetes. Please consider contacting a GP for further testing."
-    elif prob >= 0.25:
-        label = "Moderate Risk"
-        explanation = "Your results suggest a moderate risk. Lifestyle changes can significantly reduce your risk."
-    else:
-        label = "Low Risk"
-        explanation = "Your results indicate a low risk. Continue maintaining healthy habits."
-
-    # 5. Redirect to results page
-    return redirect(url_for(
-        "results_page",
-        risk_score=round(prob, 2),
-        risk_label=label,
-        explanation=explanation
-    ))
 
 
 @app.route("/")
