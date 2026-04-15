@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request, jsonify
+from app.threshold_optimisation import evaluate_at_threshold, sweep_thresholds
+from app.performance_fairness_comparison import compute_performance_fairness_comparison
 import joblib
 import numpy as np
 import os
-
-# NEW IMPORTS FOR FAIRNESS + OPTIMISATION
-from threshold_optimisation import evaluate_at_threshold, sweep_thresholds
-from performance_fairness_comparison import compute_performance_fairness_comparison
 
 # Initialise Flask
 app = Flask(__name__)
@@ -73,13 +71,14 @@ def predict_clinical_api():
 
     # Prepare features for model
     features = np.array([
-        data["SystolicBP"],
-        data["DiastolicBP"],
-        data["BMI"],
-        data["Age"],
-        data["Sex"],
-        data["Ethnicity"]
-    ]).reshape(1, -1)
+    data.get("SystolicBP", 0),
+    data.get("DiastolicBP", 0),
+    data.get("BMI", 0),
+    data.get("Age", 0),
+    data.get("Sex", 0),
+    data.get("Ethnicity", 0)
+]).reshape(1, -1)
+
 
     scaled = clinical_scaler.transform(features)
 
@@ -119,9 +118,10 @@ def fairness_metrics():
 
 # 2. Sweep thresholds (0.05 → 0.50)
 @app.route("/api/threshold_sweep", methods=["GET"])
-def sweep_thresholds(thresholds=None):
-    if thresholds is None:
-        thresholds = [i/100 for i in range(1, 100)]
+def threshold_sweep_api():
+    thresholds = [i/100 for i in range(1, 100)]
+    results = sweep_thresholds(thresholds)
+    return jsonify(results)
 
 
 # 3. comparison of performance and fairness

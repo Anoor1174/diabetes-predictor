@@ -43,7 +43,7 @@ def compute_performance_fairness_comparison(thresholds):
 
 # Optional manual test
 if __name__ == "__main__":
-    from threshold_optimisation import sweep_thresholds
+    from app.threshold_optimisation import sweep_thresholds
 
     print("Sweeping thresholds...")
     thresholds = [i/100 for i in range(1, 100)]
