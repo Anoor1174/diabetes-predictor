@@ -1,59 +1,47 @@
-// lifestyle.js
-// Computes lifestyle risk score and redirects to /result
+async function submitLifestyle(event) {
+    event.preventDefault();
+    const errorBox = document.getElementById("error");
+    errorBox.style.display = "none";
 
-function submitLifestyle() {
-    // Read inputs safely
-    const activity = Number(document.getElementById("activity_minutes").value || 0);
-    const sedentary = Number(document.getElementById("sedentary_hours").value || 0);
-    const smoking = document.getElementById("smoking_status").value;
-    const fruitVeg = Number(document.getElementById("fruit_veg").value || 0);
-    const sugary = Number(document.getElementById("sugary_drinks").value || 0);
-    const fastFood = Number(document.getElementById("fast_food").value || 0);
-    const alcohol = Number(document.getElementById("alcohol").value || 0);
-    const sleep = Number(document.getElementById("sleep_hours").value || 0);
+    const heightCm = Number(document.getElementById("height_cm").value);
+    const weightKg = Number(document.getElementById("weight_kg").value);
+    const bmi = weightKg / Math.pow(heightCm / 100, 2);
 
-    // Lifestyle scoring (simple, explainable, clinically aligned)
-    let score = 0;
+    const payload = {
+        Age: Number(document.getElementById("age").value),
+        Sex: Number(document.getElementById("sex").value),
+        Ethnicity: Number(document.getElementById("ethnicity").value),
+        BMI: Number(bmi.toFixed(1)),
+        WaistCM: document.getElementById("waist_cm").value
+            ? Number(document.getElementById("waist_cm").value) : null,
+        ActivityMinutes: Number(document.getElementById("activity_minutes").value),
+        SedentaryHours: Number(document.getElementById("sedentary_hours").value),
+        SmokingStatus: Number(document.getElementById("smoking_status").value),
+        AlcoholPerWeek: Number(document.getElementById("alcohol").value),
+        SleepHours: Number(document.getElementById("sleep_hours").value),
+        DietQuality: Number(document.getElementById("diet_quality").value),
+        MealsOutPerWeek: Number(document.getElementById("meals_out").value),
+        FamilyHistory: Number(document.getElementById("family_history").value),
+    };
 
-    // Physical activity: less activity → higher risk
-    score += Math.max(0, 150 - activity) / 150;
+    try {
+        const response = await fetch("/predict_lifestyle", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error(`Server returned ${response.status}`);
+        const data = await response.json();
 
-    // Sedentary time
-    score += Math.min(sedentary / 10, 1);
-
-    // Smoking
-    if (smoking === "current") score += 1;
-    if (smoking === "former") score += 0.5;
-
-    // Diet
-    score += Math.max(0, 5 - fruitVeg) / 5;
-    score += Math.min((sugary + fastFood) / 10, 1);
-
-    // Alcohol
-    score += Math.min(alcohol / 14, 1);
-
-    // Sleep (ideal = 7–9 hours)
-    score += Math.abs(8 - sleep) / 8;
-
-    // Normalise to 0–1
-    score = Math.min(score / 6, 1);
-    const riskScore = Number(score.toFixed(2));
-
-    // Risk label + explanation
-    let label, explanation;
-
-    if (riskScore < 0.33) {
-        label = "Low Lifestyle Risk";
-        explanation = "Your lifestyle pattern suggests a relatively low contribution to diabetes risk.";
-    } else if (riskScore < 0.66) {
-        label = "Moderate Lifestyle Risk";
-        explanation = "Some lifestyle factors may be increasing your risk. Small changes could make a big difference.";
-    } else {
-        label = "High Lifestyle Risk";
-        explanation = "Several lifestyle factors are likely increasing your diabetes risk. Consider reviewing your habits.";
+        const params = new URLSearchParams({
+            risk_score: data.risk_score,
+            risk_label: data.risk_label,
+            explanation: data.explanation,
+            pathway: "lifestyle",
+        });
+        window.location.href = `/result?${params.toString()}`;
+    } catch (err) {
+        errorBox.textContent = `Could not calculate risk: ${err.message}`;
+        errorBox.style.display = "block";
     }
-
-    // Redirect to results page (same as clinical path)
-    window.location.href =
-        `/result?risk_score=${riskScore}&risk_label=${encodeURIComponent(label)}&explanation=${encodeURIComponent(explanation)}`;
 }

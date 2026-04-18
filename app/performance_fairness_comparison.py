@@ -1,61 +1,55 @@
 import pandas as pd
 
+from app.threshold_optimisation import sweep_thresholds
+
+
+
 def compute_performance_fairness_comparison(thresholds):
-    """
-    Runs threshold sweep and computes performance vs fairness comparison.
-    Returns:
-        - all_points: DataFrame of all threshold results
-        - frontier: DataFrame of Pareto-optimal points
-    """
-
-    from threshold_optimisation import sweep_thresholds  # avoid circular import
-
-    # Run threshold sweep
     results = sweep_thresholds(thresholds)
+    if not results:
+        empty = pd.DataFrame(
+            columns=["threshold", "overall_accuracy",
+                     "overall_recall", "fairness_gap_recall"]
+        )
+        return empty, empty.copy()
 
-    # Convert results to DataFrame
     df = pd.DataFrame([
         {
             "threshold": r["threshold"],
             "overall_accuracy": r["overall_accuracy"],
             "overall_recall": r["overall_recall"],
-            "fairness_gap_recall": r["fairness_gap_recall"]
+            "fairness_gap_recall": r["fairness_gap_recall"],
         }
         for r in results
-    ])
+    ]).dropna(subset=["overall_recall", "fairness_gap_recall"])
 
-    # Sort by fairness gap (ascending)
-    df_sorted = df.sort_values("fairness_gap_recall")
+    frontier_mask = []
+    for i, row in df.iterrows():
+        dominated = (
+            (df["fairness_gap_recall"] <= row["fairness_gap_recall"])
+            & (df["overall_recall"] >= row["overall_recall"])
+            & (
+                (df["fairness_gap_recall"] < row["fairness_gap_recall"])
+                | (df["overall_recall"] > row["overall_recall"])
+            )
+        )
+        dominated.loc[i] = False  # a point doesn't dominate itself
+        frontier_mask.append(not dominated.any())
 
-    # Build Pareto frontier (min fairness gap, max recall)
-    frontier_points = []
-    best_recall_so_far = -1
-
-    for _, row in df_sorted.iterrows():
-        if row["overall_recall"] > best_recall_so_far:
-            frontier_points.append(row)
-            best_recall_so_far = row["overall_recall"]
-
-    frontier_df = pd.DataFrame(frontier_points)
-
-    return df, frontier_df
+    frontier = (
+        df[frontier_mask]
+        .sort_values("fairness_gap_recall")
+        .reset_index(drop=True)
+    )
+    return df.reset_index(drop=True), frontier
 
 
-# Optional manual test
 if __name__ == "__main__":
-    from app.threshold_optimisation import sweep_thresholds
-
-    print("Sweeping thresholds...")
-    thresholds = [i/100 for i in range(1, 100)]
-    results = sweep_thresholds(thresholds)
-
-    print("Computing performance vs fairness comparison...")
+    thresholds = [i / 100 for i in range(1, 100)]
+    print("Sweeping thresholds and building Pareto frontier...")
     all_points, frontier = compute_performance_fairness_comparison(thresholds)
-
-    print(all_points.head())
-    print(frontier.head())
-
+    print(f"Evaluated {len(all_points)} thresholds; "
+          f"{len(frontier)} on the frontier.")
     all_points.to_csv("threshold_tradeoff_points.csv", index=False)
     frontier.to_csv("pareto_frontier.csv", index=False)
-
-    print("Saved CSV files.")
+    print("Saved CSVs.")

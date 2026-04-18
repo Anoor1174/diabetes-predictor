@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="/static/style.css">
     <script src="/static/lifestyle.js" defer></script>
 </head>
-
 <body>
 
 <div class="navbar">
@@ -20,71 +19,100 @@
 </div>
 
 <div class="page-container">
-
     <h1 class="page-title">Lifestyle Risk Assessment</h1>
     <p class="page-subtitle">
-        Your lifestyle choices play a major role in diabetes risk.  
-        Complete the form below to receive a personalised lifestyle risk score.
+        This pathway predicts diabetes risk without blood pressure measurements.
+        Answer as accurately as you can — rough estimates are fine.
     </p>
 
-    <div class="card form-card">
-
-        <h2 class="section-title">Your Lifestyle Inputs</h2>
-
+    <form id="lifestyleForm" class="card form-card" onsubmit="submitLifestyle(event)">
+        <h2 class="section-title">About You</h2>
         <div class="form-grid">
-
             <div class="form-group">
-                <label>Physical Activity (minutes per week)</label>
-                <input type="number" id="activity_minutes" min="0" max="2000">
+                <label>Age</label>
+                <input type="number" id="age" min="18" max="100" required>
             </div>
-
             <div class="form-group">
-                <label>Sedentary Hours per Day</label>
-                <input type="number" id="sedentary_hours" min="0" max="24">
-            </div>
-
-            <div class="form-group">
-                <label>Smoking Status</label>
-                <select id="smoking_status">
-                    <option value="never">Never Smoked</option>
-                    <option value="former">Former Smoker</option>
-                    <option value="current">Current Smoker</option>
+                <label>Sex</label>
+                <select id="sex" required>
+                    <option value="">Select…</option>
+                    <option value="0">Male</option>
+                    <option value="1">Female</option>
                 </select>
             </div>
-
             <div class="form-group">
-                <label>Fruit & Veg Servings per Day</label>
-                <input type="number" id="fruit_veg" min="0" max="20">
+                <label>Ethnicity</label>
+                <select id="ethnicity" required>
+                    <option value="">Select…</option>
+                    <option value="1">Mexican American</option>
+                    <option value="2">Other Hispanic</option>
+                    <option value="3">Non-Hispanic White</option>
+                    <option value="4">Non-Hispanic Black</option>
+                    <option value="6">Non-Hispanic Asian</option>
+                    <option value="7">Other / Multi-Racial</option>
+                </select>
             </div>
-
             <div class="form-group">
-                <label>Sugary Drinks per Day</label>
-                <input type="number" id="sugary_drinks" min="0" max="20">
+                <label>Height (cm)</label>
+                <input type="number" id="height_cm" min="100" max="250" required>
             </div>
-
             <div class="form-group">
-                <label>Fast Food Meals per Week</label>
-                <input type="number" id="fast_food" min="0" max="20">
+                <label>Weight (kg)</label>
+                <input type="number" id="weight_kg" min="30" max="250" required>
             </div>
-
             <div class="form-group">
-                <label>Alcohol Drinks per Week</label>
-                <input type="number" id="alcohol" min="0" max="50">
+                <label>Waist circumference (cm) <span class="hint">optional</span></label>
+                <input type="number" id="waist_cm" min="40" max="200">
             </div>
-
             <div class="form-group">
-                <label>Sleep Hours per Night</label>
-                <input type="number" id="sleep_hours" min="0" max="24">
+                <label>Close relative with diabetes?</label>
+                <select id="family_history" required>
+                    <option value="">Select…</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
             </div>
-
         </div>
 
-        <button class="primary-btn" onclick="submitLifestyle()">Submit</button>
+        <h2 class="section-title">Lifestyle</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Physical activity (minutes per week)</label>
+                <input type="number" id="activity_minutes" min="0" max="3000" required>
+            </div>
+            <div class="form-group">
+                <label>Sedentary time (hours per day)</label>
+                <input type="number" id="sedentary_hours" min="0" max="24" required>
+            </div>
+            <div class="form-group">
+                <label>Smoking status</label>
+                <select id="smoking_status" required>
+                    <option value="0">Never smoked</option>
+                    <option value="1">Former smoker</option>
+                    <option value="2">Current smoker</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Alcohol drinks per week</label>
+                <input type="number" id="alcohol" min="0" max="50" required>
+            </div>
+            <div class="form-group">
+                <label>Sleep hours per night</label>
+                <input type="number" id="sleep_hours" min="0" max="14" step="0.5" required>
+            </div>
+            <div class="form-group">
+                <label>Diet quality (1 = poor, 5 = excellent)</label>
+                <input type="number" id="diet_quality" min="1" max="5" required>
+            </div>
+            <div class="form-group">
+                <label>Meals eaten away from home per week</label>
+                <input type="number" id="meals_out" min="0" max="21" required>
+            </div>
+        </div>
 
-        <div id="result" class="result-box"></div>
-
-    </div>
-
+        <button type="submit" class="primary-btn">Calculate Risk</button>
+        <div id="error" class="error-box" style="display:none;"></div>
+    </form>
 </div>
 
 </body>
