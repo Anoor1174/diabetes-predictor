@@ -1,55 +1,53 @@
 import pandas as pd
-
+import numpy as np
 from app.threshold_optimisation import sweep_thresholds
 
 
-
 def compute_performance_fairness_comparison(thresholds):
+    """
+    Runs threshold sweep and computes performance vs fairness comparison.
+    
+    Returns:
+        - all_points: DataFrame of all threshold results
+        - frontier: DataFrame of Pareto-optimal points
+    """
     results = sweep_thresholds(thresholds)
-    if not results:
-        empty = pd.DataFrame(
-            columns=["threshold", "overall_accuracy",
-                     "overall_recall", "fairness_gap_recall"]
-        )
-        return empty, empty.copy()
+    df = pd.DataFrame(results)
 
-    df = pd.DataFrame([
-        {
-            "threshold": r["threshold"],
-            "overall_accuracy": r["overall_accuracy"],
-            "overall_recall": r["overall_recall"],
-            "fairness_gap_recall": r["fairness_gap_recall"],
-        }
-        for r in results
-    ]).dropna(subset=["overall_recall", "fairness_gap_recall"])
+    required_cols = [
+        "threshold",
+        "overall_accuracy",
+        "overall_recall",
+        "fairness_gap_recall",
+    ]
+    for col in required_cols:
+        if col not in df.columns:
+            raise KeyError(f"Missing required column in sweep results: {col}")
 
+    # Pareto frontier across three metrics:
+    # We want HIGH recall, HIGH accuracy, LOW fairness gap.
+    # A point is dominated if any other point is at least as good on all three
+    # and strictly better on at least one.
     frontier_mask = []
     for i, row in df.iterrows():
-        dominated = (
-            (df["fairness_gap_recall"] <= row["fairness_gap_recall"])
-            & (df["overall_recall"] >= row["overall_recall"])
-            & (
-                (df["fairness_gap_recall"] < row["fairness_gap_recall"])
-                | (df["overall_recall"] > row["overall_recall"])
+        dominated = False
+        for j, other in df.iterrows():
+            if j == i:
+                continue
+            at_least_as_good = (
+                other["overall_recall"] >= row["overall_recall"]
+                and other["overall_accuracy"] >= row["overall_accuracy"]
+                and other["fairness_gap_recall"] <= row["fairness_gap_recall"]
             )
-        )
-        dominated.loc[i] = False  # a point doesn't dominate itself
-        frontier_mask.append(not dominated.any())
+            strictly_better_somewhere = (
+                other["overall_recall"] > row["overall_recall"]
+                or other["overall_accuracy"] > row["overall_accuracy"]
+                or other["fairness_gap_recall"] < row["fairness_gap_recall"]
+            )
+            if at_least_as_good and strictly_better_somewhere:
+                dominated = True
+                break
+        frontier_mask.append(not dominated)
 
-    frontier = (
-        df[frontier_mask]
-        .sort_values("fairness_gap_recall")
-        .reset_index(drop=True)
-    )
-    return df.reset_index(drop=True), frontier
-
-
-if __name__ == "__main__":
-    thresholds = [i / 100 for i in range(1, 100)]
-    print("Sweeping thresholds and building Pareto frontier...")
-    all_points, frontier = compute_performance_fairness_comparison(thresholds)
-    print(f"Evaluated {len(all_points)} thresholds; "
-          f"{len(frontier)} on the frontier.")
-    all_points.to_csv("threshold_tradeoff_points.csv", index=False)
-    frontier.to_csv("pareto_frontier.csv", index=False)
-    print("Saved CSVs.")
+    frontier = df[frontier_mask].reset_index(drop=True)
+    return df, frontier
