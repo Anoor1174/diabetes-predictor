@@ -1,4 +1,3 @@
-
 import os
 
 import joblib
@@ -19,13 +18,17 @@ from xgboost import XGBClassifier
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(BASE_DIR, "data", "nhanes_cleaned_lifestyle.csv")
-MODEL_PATH = os.path.join(BASE_DIR, "lifestyle_model.pkl")
-SCALER_PATH = os.path.join(BASE_DIR, "lifestyle_scaler.pkl")
-IMPUTER_PATH = os.path.join(BASE_DIR, "lifestyle_imputer.pkl")
-FEATURES_PATH = os.path.join(BASE_DIR, "lifestyle_feature_columns.pkl")
-TEST_SET_PATH = os.path.join(BASE_DIR, "lifestyle_test_set.csv")
-SUMMARY_PATH = os.path.join(BASE_DIR, "lifestyle_selection_summary.csv")
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+
+DATA_PATH = os.path.join(PROJECT_ROOT, "data", "nhanes_cleaned_lifestyle.csv")
+
+MODELS_OUT_DIR = os.path.join(PROJECT_ROOT, "app", "models")
+MODEL_PATH = os.path.join(MODELS_OUT_DIR, "lifestyle_model.pkl")
+SCALER_PATH = os.path.join(MODELS_OUT_DIR, "lifestyle_scaler.pkl")
+IMPUTER_PATH = os.path.join(MODELS_OUT_DIR, "lifestyle_imputer.pkl")
+FEATURES_PATH = os.path.join(MODELS_OUT_DIR, "lifestyle_feature_columns.pkl")
+TEST_SET_PATH = os.path.join(MODELS_OUT_DIR, "lifestyle_test_set.csv")
+SUMMARY_PATH = os.path.join(MODELS_OUT_DIR, "lifestyle_selection_summary.csv")
 
 THRESHOLD = 0.15
 RANDOM_STATE = 42
@@ -122,6 +125,9 @@ def fit_final(estimator_factory, X, y):
 
 
 def main():
+    # Make sure the output folder exists
+    os.makedirs(MODELS_OUT_DIR, exist_ok=True)
+
     X, y = load_data()
     print(f"Loaded {len(X)} rows, {X.shape[1]} features, "
           f"positive rate {y.mean():.2%}")
@@ -146,7 +152,7 @@ def main():
     for name, factory in candidates.items():
         scores[name] = cv_evaluate(factory, X, y)
         s = scores[name]
-        print(f"  {name:20s} recall {s['recall_mean']:.3f} ± "
+        print(f"  {name:20s} recall {s['recall_mean']:.3f} \u00b1 "
               f"{s['recall_std']:.3f}   precision {s['precision_mean']:.3f}   "
               f"AUC {s['auc_mean']:.3f}")
 

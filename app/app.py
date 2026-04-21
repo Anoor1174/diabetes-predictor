@@ -5,56 +5,50 @@ import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, render_template, request
 
-#from app.performance_fairness_comparison import (
-    #compute_performance_fairness_comparison,
-#)
-#from app.threshold_optimisation import evaluate_at_threshold, sweep_thresholds
+from app.performance_fairness_comparison import (
+    compute_performance_fairness_comparison,
+)
+from app.threshold_optimisation import evaluate_at_threshold, sweep_thresholds
 
 
 app = Flask(__name__)
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
 
-# Decision thresholds. DECISION_THRESHOLD is the cutoff above which a
-# user is flagged as "at risk"; LOW_RISK_MAX and MEDIUM_RISK_MAX define
-# the three-tier category used in the UI.
 DECISION_THRESHOLD = 0.15
 LOW_RISK_MAX = 0.15
 MEDIUM_RISK_MAX = 0.35
 RULE_OVERRIDE_BOOST = 0.20
 
-VALID_ETHNICITY_CODES = {1, 2, 3, 4, 6, 7}  # NHANES RIDRETH3 valid values
+VALID_ETHNICITY_CODES = {1, 2, 3, 4, 6, 7}
 VALID_SEX_CODES = {0, 1}
 VALID_SMOKING_CODES = {0, 1, 2}
 VALID_FAMILY_HISTORY_CODES = {0, 1}
 
-# Numeric columns for the lifestyle pathway — these are the ones the
-# lifestyle scaler was fitted on. Binary and categorical columns pass
-# through unscaled.
 LIFESTYLE_NUMERIC_COLS = [
     "Age", "BMI", "WaistCM", "ActivityMinutes", "SedentaryHours",
     "AlcoholPerWeek", "SleepHours", "DietQuality", "MealsOutPerWeek",
 ]
 
 
-#def _load_artefact(filename):
- #   path = os.path.join(MODEL_DIR, filename)
-  #  if not os.path.exists(path):
-   #     raise FileNotFoundError(
-    #        f"Missing model artefact: {path}. "
-     #       f"Run the relevant training script first."
-      #  )
-    #return joblib.load(path)
+def _load_artefact(filename):
+    path = os.path.join(MODEL_DIR, filename)
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            f"Missing model artefact: {path}. "
+            f"Run the relevant training script first."
+        )
+    return joblib.load(path)
 
 
-#clinical_model = _load_artefact("clinical_model.pkl")
-#clinical_scaler = _load_artefact("clinical_scaler.pkl")
-#clinical_features = _load_artefact("clinical_feature_columns.pkl")
+clinical_model = _load_artefact("clinical_model.pkl")
+clinical_scaler = _load_artefact("clinical_scaler.pkl")
+clinical_features = _load_artefact("clinical_feature_columns.pkl")
 
-#lifestyle_model = _load_artefact("lifestyle_model.pkl")
-#lifestyle_scaler = _load_artefact("lifestyle_scaler.pkl")
-#lifestyle_imputer = _load_artefact("lifestyle_imputer.pkl")
-#lifestyle_features = _load_artefact("lifestyle_feature_columns.pkl")
+lifestyle_model = _load_artefact("lifestyle_model.pkl")
+lifestyle_scaler = _load_artefact("lifestyle_scaler.pkl")
+lifestyle_imputer = _load_artefact("lifestyle_imputer.pkl")
+lifestyle_features = _load_artefact("lifestyle_feature_columns.pkl")
 
 
 def risk_category(prob):
@@ -277,6 +271,16 @@ def predict_lifestyle_api():
         "risk_label": f"{category} Lifestyle Risk",
         "explanation": risk_explanation(category, "lifestyle"),
         "pathway": "lifestyle",
+    })
+
+@app.route("/api/pareto_frontier", methods=["GET"])
+def pareto_frontier_api():
+    """Alias for /api/performance_fairness_comparison to match dashboard.js naming."""
+    thresholds = [i / 100 for i in range(1, 100)]
+    all_points, frontier = compute_performance_fairness_comparison(thresholds)
+    return jsonify({
+        "all_points": all_points.to_dict(orient="records"),
+        "pareto_frontier": frontier.to_dict(orient="records"),
     })
 
 

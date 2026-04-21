@@ -13,8 +13,9 @@ import pandas as pd
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-NHANES_DIR = os.path.join(BASE_DIR, "data", "NHANES")
-OUTPUT_PATH = os.path.join(BASE_DIR, "data", "nhanes_cleaned_lifestyle.csv")
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+NHANES_DIR = os.path.join(PROJECT_ROOT, "data", "NHANES")
+OUTPUT_PATH = os.path.join(PROJECT_ROOT, "data", "nhanes_cleaned_lifestyle.csv")
 
 # NHANES cycle J = 2017-2018 survey.
 FILES = {
