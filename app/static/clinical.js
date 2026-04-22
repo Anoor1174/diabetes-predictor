@@ -29,32 +29,29 @@ document.addEventListener("DOMContentLoaded", () => {
         const resultBox = document.getElementById("clinical-result");
         resultBox.innerHTML = "Calculating...";
 
-        const response = await fetch("/api/predict_clinical", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
-        });
+        try {
+            const response = await fetch("/api/predict_clinical", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload)
+            });
 
-        const result = await response.json();
+            if (!response.ok) throw new Error(`Server returned ${response.status}`);
 
-        let colour = "#007f3b"; 
-        if (result.risk_category === "Medium") colour = "#ffbf00";
-        if (result.risk_category === "High") colour = "#d4351c";
+            const result = await response.json();
 
-        const barWidth = Math.min(100, result.final_probability * 100);
+            // Redirect to results page with the prediction data
+            const params = new URLSearchParams({
+                risk_score: result.risk_score,
+                risk_label: result.risk_label,
+                explanation: result.explanation,
+                pathway: "clinical",
+            });
+            window.location.href = `/result?${params.toString()}`;
 
-        resultBox.innerHTML = `
-            <h3 style="color:${colour}">Risk Category: ${result.risk_category}</h3>
-
-            <p><strong>Final Probability:</strong> ${(result.final_probability * 100).toFixed(1)}%</p>
-
-            <div style="background:#ddd; width:100%; height:14px; border-radius:6px;">
-                <div style="width:${barWidth}%; height:14px; background:${colour}; border-radius:6px;"></div>
-            </div>
-
-            <p style="margin-top:15px;"><strong>ML Probability:</strong> ${(result.ml_probability * 100).toFixed(1)}%</p>
-
-        `;
+        } catch (err) {
+            resultBox.innerHTML = `<p style="color:red;">Could not calculate risk: ${err.message}</p>`;
+        }
     });
 
 });

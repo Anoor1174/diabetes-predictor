@@ -61,14 +61,6 @@ def risk_category(prob):
 
 
 def rule_based_adjustments(data):
-    """Return a list of triggered clinical-rule flags.
-
-    Rules are applied as *boosts* to the ML probability rather than
-    hard overrides. This keeps the displayed probability, prediction,
-    and category internally consistent — a rule firing adds
-    RULE_OVERRIDE_BOOST to the probability, which then feeds into
-    both the binary prediction and the risk category.
-    """
     rules = []
     if data.get("Age", 0) >= 70 and data.get("BMI", 0) >= 30:
         rules.append("Age ≥ 70 and BMI ≥ 30")
@@ -149,7 +141,7 @@ def _build_clinical_row(data):
     }])
     row = pd.get_dummies(row, columns=["Ethnicity"], drop_first=True)
     row = row.reindex(columns=clinical_features, fill_value=0)
-    return row.to_numpy(dtype=float)
+    return row  
 
 
 @app.route("/api/predict_clinical", methods=["POST"])
@@ -159,10 +151,10 @@ def predict_clinical_api():
     if error:
         return jsonify({"error": error}), 400
 
-    arr = _build_clinical_row(coerced)
-    scaled = clinical_scaler.transform(arr)
-    ml_prob = float(clinical_model.predict_proba(scaled)[0, 1])
-
+    row_df = _build_clinical_row(coerced)
+    numeric_cols = ["Age", "BMI", "SystolicBP", "DiastolicBP"]
+    row_df[numeric_cols] = clinical_scaler.transform(row_df[numeric_cols])
+    ml_prob = float(clinical_model.predict_proba(row_df)[0, 1])
     rules = rule_based_adjustments(coerced)
     final_prob = min(1.0, ml_prob + RULE_OVERRIDE_BOOST * bool(rules))
     prediction = int(final_prob >= DECISION_THRESHOLD)
@@ -174,6 +166,9 @@ def predict_clinical_api():
         "prediction": prediction,
         "risk_category": category,
         "rules_triggered": rules,
+        "risk_score": round(final_prob, 3),
+        "risk_label": f"{category} Clinical Risk",
+        "explanation": risk_explanation(category, "clinical"),
         "pathway": "clinical",
     })
 
@@ -228,13 +223,15 @@ def _build_lifestyle_row(data):
     row = pd.DataFrame([data])
     row = pd.get_dummies(row, columns=["Ethnicity"], drop_first=True)
     row = row.reindex(columns=lifestyle_features, fill_value=0)
-    arr = lifestyle_imputer.transform(row.to_numpy(dtype=float))
-    numeric_idx = [
-        lifestyle_features.index(c)
-        for c in LIFESTYLE_NUMERIC_COLS if c in lifestyle_features
-    ]
-    arr[:, numeric_idx] = lifestyle_scaler.transform(arr[:, numeric_idx])
-    return arr
+    # Impute missing values
+    row_imputed = pd.DataFrame(
+        lifestyle_imputer.transform(row),
+        columns=lifestyle_features
+    )
+    # Scale only numeric columns by name
+    numeric_cols = [c for c in LIFESTYLE_NUMERIC_COLS if c in lifestyle_features]
+    row_imputed[numeric_cols] = lifestyle_scaler.transform(row_imputed[numeric_cols])
+    return row_imputed
 
 
 @app.route("/api/predict_lifestyle", methods=["POST"])
@@ -244,17 +241,13 @@ def predict_lifestyle_api():
     if error:
         return jsonify({"error": error}), 400
 
-    arr = _build_lifestyle_row(coerced)
-    ml_prob = float(lifestyle_model.predict_proba(arr)[0, 1])
-
-    # The lifestyle pathway has access to BMI but not BP, so only the
-    # BMI-based rules apply. Systolic BP rule is skipped.
+    row_df = _build_lifestyle_row(coerced)
+    ml_prob = float(lifestyle_model.predict_proba(row_df)[0, 1])
     applicable_rules = []
     if coerced["Age"] >= 70 and coerced["BMI"] >= 30:
         applicable_rules.append("Age ≥ 70 and BMI ≥ 30")
     if coerced["BMI"] >= 40:
         applicable_rules.append("BMI ≥ 40")
-
     final_prob = min(
         1.0, ml_prob + RULE_OVERRIDE_BOOST * bool(applicable_rules)
     )

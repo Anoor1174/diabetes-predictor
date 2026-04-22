@@ -23,8 +23,6 @@ class ClinicalModelTrainer:
     def __init__(self, config: DatasetConfig):
         self.config = config
         self.scaler = StandardScaler()
-
-        #XGBoost configured for imbalanced screening data
         self.model = XGBClassifier(
             n_estimators=300,
             max_depth=6,
@@ -32,18 +30,14 @@ class ClinicalModelTrainer:
             subsample=0.8,
             colsample_bytree=0.8,
             eval_metric="logloss",
-            scale_pos_weight=40,   #handles class imbalance
+            scale_pos_weight=40,   
             random_state=42
         )
 
     def load_data(self):
-        #load up the NHANES dataset
         df = pd.read_csv(self.config.path)
-
-        #fill missing values with median
         X = df[self.config.features].fillna(df[self.config.features].median())
         y = df[self.config.target]
-
         return X, y
 
     def split_and_balance(self, X, y):
@@ -51,7 +45,6 @@ class ClinicalModelTrainer:
             X, y, test_size=0.2, random_state=42, stratify=y
         )
 
-        #here we apply SMOTE to balance the training data
         sm = SMOTE(random_state=42)
         X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
 

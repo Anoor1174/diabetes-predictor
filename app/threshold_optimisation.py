@@ -52,17 +52,10 @@ X_arr[:, numeric_idx] = scaler.transform(X_arr[:, numeric_idx])
 
 
 def evaluate_at_threshold(threshold: float) -> dict:
-    """
-    Evaluate model performance and fairness at a given decision threshold.
-    Returns a dict with overall accuracy/recall, per-group recall, and
-    the fairness gap (max recall - min recall across groups).
-    """
     probs = model.predict_proba(X_arr)[:, 1]
     y_pred = (probs >= threshold).astype(int)
-
     overall_accuracy = accuracy_score(y, y_pred)
     overall_recall = recall_score(y, y_pred)
-
     group_metrics = {}
     recalls = []
 

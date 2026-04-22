@@ -25,7 +25,7 @@ async function submitLifestyle(event) {
     };
 
     try {
-        const response = await fetch("/predict_lifestyle", {
+        const response = await fetch("/api/predict_lifestyle", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),

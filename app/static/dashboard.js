@@ -28,7 +28,7 @@ async function loadMetrics(threshold) {
         recallChart = new Chart(document.getElementById("recallChart"), {
             type: "bar",
             data: {
-                labels: labels,
+                labels: ['Mexican American', 'Other Hispanic', 'Non-Hispanic White', 'Non-Hispanic Black', 'Non-Hispanic Asian'],
                 datasets: [{
                     label: "Recall",
                     data: recalls,
