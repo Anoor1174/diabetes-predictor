@@ -1,11 +1,3 @@
-"""Merge NHANES cycle J files into a cleaned dataset for the lifestyle model.
-
-Pulls demographics, anthropometrics, diabetes status, and lifestyle
-questionnaire responses. Derives composite features (total physical
-activity minutes/week, smoking category) rather than exposing raw
-NHANES column names that users couldn't reasonably answer in a form.
-"""
-
 import os
 
 import numpy as np

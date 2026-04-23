@@ -1,5 +1,7 @@
+// Wait for the DOM to load
 document.addEventListener("DOMContentLoaded", () => {
 
+    // Attach click handler to predict button
     document.getElementById("predict-btn").addEventListener("click", async () => {
 
         // Retrieves the user inputs
@@ -26,18 +28,22 @@ document.addEventListener("DOMContentLoaded", () => {
             DiastolicBP: parseFloat(dbp)
         };
 
+        // Placeholder while request runs
         const resultBox = document.getElementById("clinical-result");
         resultBox.innerHTML = "Calculating...";
 
         try {
+            // Send prediction request to Flask API
             const response = await fetch("/api/predict_clinical", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(payload)
             });
 
+            // Throw error if response not OK
             if (!response.ok) throw new Error(`Server returned ${response.status}`);
 
+            // Parse JSON response body
             const result = await response.json();
 
             // Redirect to results page with the prediction data
@@ -50,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = `/result?${params.toString()}`;
 
         } catch (err) {
+            // Display error message to user
             resultBox.innerHTML = `<p style="color:red;">Could not calculate risk: ${err.message}</p>`;
         }
     });
