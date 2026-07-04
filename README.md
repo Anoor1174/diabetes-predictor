@@ -67,5 +67,5 @@ diabetes-predictor/
 
 ## Installation & Workspace Setup
 
-**[Launch Live Diabetes Risk Predictor Console](https://diabetes-predictor-81py.onrender.com/dashboard)**
+**[Launch Live Diabetes Risk Predictor Console](https://diabetes-predictor-81py.onrender.com/)**
 
