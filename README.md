@@ -24,7 +24,7 @@ A dedicated auditing interface built to mitigate systemic healthcare discrepanci
 * **Pareto Frontier Scatter Plot:** A multi-objective evaluation engine graphing the explicit trade-off between absolute predictive recall vs algorithmic fairness constraints.
 
 
-### 4. Gamified Kids' Health Module (Childhood Obesity & Diabetes Prevention)
+### 4. Gamified Kids' Health Module (Childhood Obesity & Diabetes Prevention) - Coming soon
 An interactive, educational extension designed specifically to translate complex metabolic health concepts into an engaging, non-anxious experience for younger audiences:
 * **The Daily Power Meter:** A simplified lifestyle logging interface where children track positive daily habits (hydration, nutrition, outdoor play) to visually fill an interactive energy bar.
 * **Hero Quest Story Mode:** A choice-based text adventure path that guides kids through everyday scenarios, demonstrating how balanced choices defeat low-energy obstacles.
