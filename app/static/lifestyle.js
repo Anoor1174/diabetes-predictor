@@ -1,4 +1,11 @@
 // Handle lifestyle form submission
+function optionalNumber(id) {
+    // Returns null for a blank/untouched field so the backend imputer
+    // fills it with the population median instead of assuming zero.
+    const el = document.getElementById(id);
+    return el.value === "" ? null : Number(el.value);
+}
+
 async function submitLifestyle(event) {
     // Stop the browser default submit
     event.preventDefault();
@@ -6,29 +13,39 @@ async function submitLifestyle(event) {
     const errorBox = document.getElementById("error");
     errorBox.style.display = "none";
 
-    // Read height and weight for BMI
-    const heightCm = Number(document.getElementById("height_cm").value);
-    const weightKg = Number(document.getElementById("weight_kg").value);
-    // Calculate BMI from height and weight
-    const bmi = weightKg / Math.pow(heightCm / 100, 2);
+    // Required fields
+    const age = document.getElementById("age").value;
+    const sex = document.getElementById("sex").value;
+    const ethnicity = document.getElementById("ethnicity").value;
+    const heightCm = document.getElementById("height_cm").value;
+    const weightKg = document.getElementById("weight_kg").value;
+    const familyHistory = document.getElementById("family_history").value;
 
-    // Build the payload for the API
+    if (!age || sex === "" || ethnicity === "" || !heightCm || !weightKg || familyHistory === "") {
+        errorBox.textContent = "Please fill in the essentials section before calculating your risk.";
+        errorBox.style.display = "block";
+        return;
+    }
+
+    // Calculate BMI from height and weight
+    const bmi = Number(weightKg) / Math.pow(Number(heightCm) / 100, 2);
+
+    // Build the payload for the API. Optional fields fall back to null,
+    // which the backend imputer fills rather than treating as zero.
     const payload = {
-        Age: Number(document.getElementById("age").value),
-        Sex: Number(document.getElementById("sex").value),
-        Ethnicity: Number(document.getElementById("ethnicity").value),
+        Age: Number(age),
+        Sex: Number(sex),
+        Ethnicity: Number(ethnicity),
         BMI: Number(bmi.toFixed(1)),
-        // Waist is optional
-        WaistCM: document.getElementById("waist_cm").value
-            ? Number(document.getElementById("waist_cm").value) : null,
-        ActivityMinutes: Number(document.getElementById("activity_minutes").value),
-        SedentaryHours: Number(document.getElementById("sedentary_hours").value),
-        SmokingStatus: Number(document.getElementById("smoking_status").value),
-        AlcoholPerWeek: Number(document.getElementById("alcohol").value),
-        SleepHours: Number(document.getElementById("sleep_hours").value),
-        DietQuality: Number(document.getElementById("diet_quality").value),
-        MealsOutPerWeek: Number(document.getElementById("meals_out").value),
-        FamilyHistory: Number(document.getElementById("family_history").value),
+        WaistCM: optionalNumber("waist_cm"),
+        ActivityMinutes: optionalNumber("activity_minutes"),
+        SedentaryHours: optionalNumber("sedentary_hours"),
+        SmokingStatus: optionalNumber("smoking_status"),
+        AlcoholPerWeek: optionalNumber("alcohol"),
+        SleepHours: optionalNumber("sleep_hours"),
+        DietQuality: optionalNumber("diet_quality"),
+        MealsOutPerWeek: optionalNumber("meals_out"),
+        FamilyHistory: Number(familyHistory),
     };
 
     try {

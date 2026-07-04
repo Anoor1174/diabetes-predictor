@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Lifestyle Assessment</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="/static/lifestyle.js" defer></script>
@@ -19,14 +20,16 @@
 </div>
 
 <div class="page-container">
+    <div class="eyebrow">Lifestyle Pathway</div>
     <h1 class="page-title">Lifestyle Risk Assessment</h1>
     <p class="page-subtitle">
         This pathway predicts diabetes risk without blood pressure measurements.
-        Answer as accurately as you can — rough estimates are fine.
+        The six fields below drive almost all of the estimate — everything else
+        is optional and only fine-tunes the result.
     </p>
 
     <form id="lifestyleForm" class="card form-card" onsubmit="submitLifestyle(event)">
-        <h2 class="section-title">About You</h2>
+        <h2 class="section-title">The essentials</h2>
         <div class="form-grid">
             <div class="form-group">
                 <label>Age</label>
@@ -61,10 +64,6 @@
                 <input type="number" id="weight_kg" min="30" max="250" required>
             </div>
             <div class="form-group">
-                <label>Waist circumference (cm) <span class="hint">optional</span></label>
-                <input type="number" id="waist_cm" min="40" max="200">
-            </div>
-            <div class="form-group">
                 <label>Close relative with diabetes?</label>
                 <select id="family_history" required>
                     <option value="">Select…</option>
@@ -74,41 +73,54 @@
             </div>
         </div>
 
-        <h2 class="section-title">Lifestyle</h2>
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Physical activity (minutes per week)</label>
-                <input type="number" id="activity_minutes" min="0" max="3000" required>
+        <details class="optional-panel">
+            <summary>+ Add more detail for a finer-grained result (optional)</summary>
+
+            <p class="hint" style="margin: 10px 0 18px;">
+                None of this is required. Anything you skip is filled in using the
+                population median rather than assumed to be zero.
+            </p>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Waist circumference (cm)</label>
+                    <input type="number" id="waist_cm" min="40" max="200">
+                </div>
+                <div class="form-group">
+                    <label>Physical activity (minutes per week)</label>
+                    <input type="number" id="activity_minutes" min="0" max="3000">
+                </div>
+                <div class="form-group">
+                    <label>Sedentary time (hours per day)</label>
+                    <input type="number" id="sedentary_hours" min="0" max="24">
+                </div>
+                <div class="form-group">
+                    <label>Smoking status</label>
+                    <select id="smoking_status">
+                        <option value="">Prefer not to say</option>
+                        <option value="0">Never smoked</option>
+                        <option value="1">Former smoker</option>
+                        <option value="2">Current smoker</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Alcohol drinks per week</label>
+                    <input type="number" id="alcohol" min="0" max="50">
+                </div>
+                <div class="form-group">
+                    <label>Sleep hours per night</label>
+                    <input type="number" id="sleep_hours" min="0" max="14" step="0.5">
+                </div>
+                <div class="form-group">
+                    <label>Diet quality (1 = poor, 5 = excellent)</label>
+                    <input type="number" id="diet_quality" min="1" max="5">
+                </div>
+                <div class="form-group">
+                    <label>Meals eaten away from home per week</label>
+                    <input type="number" id="meals_out" min="0" max="21">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Sedentary time (hours per day)</label>
-                <input type="number" id="sedentary_hours" min="0" max="24" required>
-            </div>
-            <div class="form-group">
-                <label>Smoking status</label>
-                <select id="smoking_status" required>
-                    <option value="0">Never smoked</option>
-                    <option value="1">Former smoker</option>
-                    <option value="2">Current smoker</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Alcohol drinks per week</label>
-                <input type="number" id="alcohol" min="0" max="50" required>
-            </div>
-            <div class="form-group">
-                <label>Sleep hours per night</label>
-                <input type="number" id="sleep_hours" min="0" max="14" step="0.5" required>
-            </div>
-            <div class="form-group">
-                <label>Diet quality (1 = poor, 5 = excellent)</label>
-                <input type="number" id="diet_quality" min="1" max="5" required>
-            </div>
-            <div class="form-group">
-                <label>Meals eaten away from home per week</label>
-                <input type="number" id="meals_out" min="0" max="21" required>
-            </div>
-        </div>
+        </details>
 
         <button type="submit" class="primary-btn">Calculate Risk</button>
         <div id="error" class="error-box" style="display:none;"></div>

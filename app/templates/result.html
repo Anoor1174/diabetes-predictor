@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Risk Result</title>
+    <meta charset="UTF-8">
+    <title>Your Risk Result</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -12,48 +13,87 @@
     <a href="/insights">Insights From Data</a>
     <a href="/lifestyle">Lifestyle Risk Path</a>
     <a href="/clinical">Clinical Risk Path</a>
-    <a href="/result">Your Results</a>
-    <a href="/dashboard">view your dashboard</a>
+    <a href="/result" class="active">Your Results</a>
+    <a href="/dashboard">View Dashboard</a>
     <a href="/help">Help & Contact</a>
 </div>
 
-<div class="container"> 
-    <h1>Your Result</h1>
+{% set pct = ((risk_score|float) * 100)|round(1) %}
+{% set category = 'risk-low' %}
+{% set category_word = 'LOW' %}
+{% if pct >= 35 %}
+    {% set category = 'risk-high' %}
+    {% set category_word = 'HIGH' %}
+{% elif pct >= 15 %}
+    {% set category = 'risk-medium' %}
+    {% set category_word = 'MEDIUM' %}
+{% endif %}
 
-    <h2>{{ result }}</h2>
+<div class="container">
+    <div class="eyebrow">Screening Result / {{ pathway|default('clinical', true)|upper }} PATHWAY</div>
+    <h1>Your Diabetes Risk Estimate</h1>
 
-    <p style="margin-top:20px; font-size:14px; color:grey;">
-        This is a statistical risk estimate, not a medical diagnosis.
-        If you are concerned about your health, please consult a healthcare professional.
-    </p>
+    <div class="info-card">
+        <div class="risk-meter">
+            <div class="risk-readout">
+                <span class="risk-percentage {{ category }}" id="riskPercentText">0%</span>
+                <span class="risk-category-tag {{ category }}">{{ category_word }} RISK</span>
+            </div>
 
-    <br>
+            <div class="risk-meter-track">
+                <div class="risk-meter-fill {{ category }}" id="riskFill" data-target="{{ pct }}"></div>
+            </div>
+            <div class="risk-scale-labels">
+                <span>0%</span>
+                <span>15%</span>
+                <span>35%</span>
+                <span>100%</span>
+            </div>
+        </div>
+
+        <h3 class="section-title">What This Means</h3>
+        <p>{{ explanation }}</p>
+
+        <h3 class="section-title">Next Steps</h3>
+        <ul>
+            <li>If high risk → book a GP appointment.</li>
+            <li>If moderate risk → lifestyle changes recommended.</li>
+            <li>If low risk → continue healthy habits.</li>
+        </ul>
+
+        <a href="/advice">
+            <button class="btn-primary">View Personalised Advice</button>
+        </a>
+
+        <p class="disclaimer">
+            This is a statistical risk estimate, not a medical diagnosis.
+            If you are concerned about your health, please consult a healthcare professional.
+        </p>
+    </div>
+
     <a href="/">Back to Home</a>
 </div>
 
-<div class="info-card">
-    <h2>Your Diabetes Risk Result</h2>
+<script>
+    // Animate the percentage count-up and bar fill on load
+    const fillEl = document.getElementById('riskFill');
+    const textEl = document.getElementById('riskPercentText');
+    const target = parseFloat(fillEl.dataset.target) || 0;
 
-    <div class="result-box">
-        <strong>Risk Score:</strong> {{ risk_score }}<br>
-        <strong>Category:</strong> {{ risk_label }}
-    </div>
+    requestAnimationFrame(() => {
+        fillEl.style.width = Math.min(target, 100) + '%';
+    });
 
-    <h3>What This Means</h3>
-    <p>{{ explanation }}</p>
-
-    <h3>Next Steps</h3>
-    <ul>
-        <li>If high risk → book a GP appointment.</li>
-        <li>If moderate risk → lifestyle changes recommended.</li>
-        <li>If low risk → continue healthy habits.</li>
-    </ul>
-
-    <a href="/advice">
-        <button class="btn-primary">View Personalised Advice</button>
-    </a>
-</div>
-
+    const duration = 1100;
+    const start = performance.now();
+    function tick(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        textEl.textContent = (target * eased).toFixed(1) + '%';
+        if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+</script>
 
 </body>
 </html>

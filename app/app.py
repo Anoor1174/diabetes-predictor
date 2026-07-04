@@ -232,20 +232,44 @@ def _validate_lifestyle_input(data):
                 float(data["WaistCM"])
                 if data.get("WaistCM") not in (None, "") else np.nan
             ),
-            "ActivityMinutes": float(data.get("ActivityMinutes", 0)),
-            "SedentaryHours": float(data.get("SedentaryHours", 0)),
-            "SmokingStatus": int(data.get("SmokingStatus", 0)),
-            "AlcoholPerWeek": float(data.get("AlcoholPerWeek", 0)),
-            "SleepHours": float(data.get("SleepHours", 0)),
-            "DietQuality": int(data.get("DietQuality", 3)),
-            "MealsOutPerWeek": float(data.get("MealsOutPerWeek", 0)),
+            # Low/negligible-impact fields (see model coefficient audit) are
+            # optional. Left blank, the trained imputer fills the population
+            # median rather than us silently assuming 0.
+            "ActivityMinutes": (
+                float(data["ActivityMinutes"])
+                if data.get("ActivityMinutes") not in (None, "") else np.nan
+            ),
+            "SedentaryHours": (
+                float(data["SedentaryHours"])
+                if data.get("SedentaryHours") not in (None, "") else np.nan
+            ),
+            "SmokingStatus": (
+                int(data["SmokingStatus"])
+                if data.get("SmokingStatus") not in (None, "") else np.nan
+            ),
+            "AlcoholPerWeek": (
+                float(data["AlcoholPerWeek"])
+                if data.get("AlcoholPerWeek") not in (None, "") else np.nan
+            ),
+            "SleepHours": (
+                float(data["SleepHours"])
+                if data.get("SleepHours") not in (None, "") else np.nan
+            ),
+            "DietQuality": (
+                int(data["DietQuality"])
+                if data.get("DietQuality") not in (None, "") else np.nan
+            ),
+            "MealsOutPerWeek": (
+                float(data["MealsOutPerWeek"])
+                if data.get("MealsOutPerWeek") not in (None, "") else np.nan
+            ),
             "FamilyHistory": int(data.get("FamilyHistory", 0)),
         }
     except (ValueError, TypeError):
         # Reject non-numeric inputs
         return None, "Invalid input data: non-numeric field"
 
-    # Range checks for each lifestyle feature
+    # Range checks for each lifestyle feature (skipped when left blank)
     if not 18 <= coerced["Age"] <= 100:
         return None, "Age must be between 18 and 100"
     if coerced["Sex"] not in VALID_SEX_CODES:
@@ -254,17 +278,17 @@ def _validate_lifestyle_input(data):
         return None, "Ethnicity code not recognised"
     if not 13 <= coerced["BMI"] <= 70:
         return None, "BMI must be between 13 and 70"
-    if coerced["SmokingStatus"] not in VALID_SMOKING_CODES:
+    if not pd.isna(coerced["SmokingStatus"]) and coerced["SmokingStatus"] not in VALID_SMOKING_CODES:
         return None, "Smoking status must be 0, 1 or 2"
     if coerced["FamilyHistory"] not in VALID_FAMILY_HISTORY_CODES:
         return None, "Family history must be 0 or 1"
-    if not 1 <= coerced["DietQuality"] <= 5:
+    if not pd.isna(coerced["DietQuality"]) and not 1 <= coerced["DietQuality"] <= 5:
         return None, "Diet quality must be between 1 and 5"
-    if not 0 <= coerced["ActivityMinutes"] <= 3000:
+    if not pd.isna(coerced["ActivityMinutes"]) and not 0 <= coerced["ActivityMinutes"] <= 3000:
         return None, "Activity minutes must be between 0 and 3000"
-    if not 0 <= coerced["SedentaryHours"] <= 24:
+    if not pd.isna(coerced["SedentaryHours"]) and not 0 <= coerced["SedentaryHours"] <= 24:
         return None, "Sedentary hours must be between 0 and 24"
-    if not 0 <= coerced["SleepHours"] <= 14:
+    if not pd.isna(coerced["SleepHours"]) and not 0 <= coerced["SleepHours"] <= 14:
         return None, "Sleep hours must be between 0 and 14"
     return coerced, None
 
