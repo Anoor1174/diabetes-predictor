@@ -1,52 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Healthy Plate Challenge</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='kids.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% set active_page = 'advice' %}
+{% block title %}Healthy Living & Diabetes Information{% endblock %}
 
-<div class="kids-topbar">
-    <a href="/" class="kids-back-link">← Back to main site</a>
-</div>
+{% block content %}
+<div class="container">
+    <h1>Understanding Diabetes & Healthy Living</h1>
+    <p>This page provides general information about diabetes and healthy lifestyle habits. It is not medical advice. Always speak to a healthcare professional if you have concerns about your health.</p>
 
-<div class="kids-wrap">
-    <h1 class="kids-title">🍎 Healthy Plate Challenge 🥦</h1>
-    <p class="kids-subtitle">Tap the foods to fill your plate. Try to make it colourful and balanced!</p>
-
-    <div class="kids-scoreboard">
-        <div class="kids-score-chip">
-            <span class="kids-score-label">Plate Points</span>
-            <span class="kids-score-value" id="score">0</span>
-        </div>
-        <div class="kids-score-chip">
-            <span class="kids-score-label">Foods on Plate</span>
-            <span class="kids-score-value" id="plateCount">0 / 6</span>
-        </div>
+    <div class="faq-box">
+        <h2>What Is Diabetes?</h2>
+        <p>Diabetes is a condition where the body struggles to regulate blood sugar levels. Type 2 diabetes is the most common form and is often linked to lifestyle factors such as diet, weight, and physical activity.</p>
     </div>
 
-    <div class="plate-area">
-        <div class="plate" id="plate">
-            <div class="plate-hint" id="plateHint">Your plate is empty — start tapping foods below!</div>
-        </div>
-    </div>
-
-    <div id="feedback" class="kids-feedback"></div>
-
-    <h2 class="kids-section-heading">Pick a food!</h2>
-    <div class="food-grid" id="foodGrid"></div>
-
-    <div id="badgeModal" class="badge-modal hidden">
-        <div class="badge-card">
-            <div class="badge-emoji" id="badgeEmoji">🏆</div>
-            <h2 id="badgeTitle">Badge Unlocked!</h2>
-            <p id="badgeText"></p>
-            <button class="kids-btn" onclick="playAgain()">Play Again</button>
-        </div>
+    <div class="faq-box">
+        <h2>Common Symptoms</h2>
+        <ul>
+            <li>Increased thirst</li>
+            <li>Frequent urination</li>
+            <li>Fatigue</li>
+            <li>Blurred vision</li>
+            <li>Slow wound healing</li>
+        </ul>
+        <p>If you experience these symptoms, consider speaking to your GP.</p>
     </div>
 </div>
-
-<script src="{{ url_for('static', filename='kids.js') }}"></script>
-</body>
-</html>
+{% endblock %}
