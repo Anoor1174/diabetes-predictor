@@ -1,24 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Lifestyle Assessment</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <script src="/static/lifestyle.js" defer></script>
-</head>
-<body>
+{% extends "base.html" %}
+{% set active_page = 'lifestyle' %}
+{% block title %}Lifestyle Assessment{% endblock %}
 
-<div class="navbar">
-    <a href="/">Home</a>
-    <a href="/diabetesinfo">Diabetes Information</a>
-    <a href="/insights">Insights From Data</a>
-    <a href="/lifestyle" class="active">Lifestyle Risk Path</a>
-    <a href="/clinical">Clinical Risk Path</a>
-    <a href="/result">Your Results</a>
-    <a href="/dashboard">View Dashboard</a>
-    <a href="/help">Help & Contact</a>
-</div>
-
+{% block content %}
 <div class="page-container">
     <div class="eyebrow">Lifestyle Pathway</div>
     <h1 class="page-title">Lifestyle Risk Assessment</h1>
@@ -126,6 +110,8 @@
         <div id="error" class="error-box" style="display:none;"></div>
     </form>
 </div>
+{% endblock %}
 
-</body>
-</html>
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='lifestyle.js') }}"></script>
+{% endblock %}

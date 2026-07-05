@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Diabetes Risk Predictor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<div class="navbar">
+    <a href="/" {% if active_page == 'home' %}class="active"{% endif %}>Home</a>
+    <a href="/diabetesinfo" {% if active_page == 'diabetesinfo' %}class="active"{% endif %}>Diabetes Information</a>
+    <a href="/insights" {% if active_page == 'insights' %}class="active"{% endif %}>Insights From Data</a>
+    <a href="/lifestyle" {% if active_page == 'lifestyle' %}class="active"{% endif %}>Lifestyle Risk Path</a>
+    <a href="/clinical" {% if active_page == 'clinical' %}class="active"{% endif %}>Clinical Risk Path</a>
+    <a href="/result" {% if active_page == 'result' %}class="active"{% endif %}>Your Results</a>
+    <a href="/dashboard" {% if active_page == 'dashboard' %}class="active"{% endif %}>View Dashboard</a>
+    <a href="/help" {% if active_page == 'help' %}class="active"{% endif %}>Help & Contact</a>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">🌙</button>
+</div>
+
+{% block content %}{% endblock %}
+
+{% block extra_scripts %}{% endblock %}
+
+</body>
+</html>

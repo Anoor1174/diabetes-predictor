@@ -1,36 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Diabetes information and insights into results</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% set active_page = 'insights' %}
+{% block title %}Diabetes Information and Insights{% endblock %}
 
-<div class="navbar">
-    <a href="/">Home</a>
-    <a href="/diabetesinfo">Diabetes Information</a>
-    <a href="/insights">Insights From Data</a>
-    <a href="/lifestyle">Lifestyle Risk Path</a>
-    <a href="/clinical">Clinical Risk Path</a>
-    <a href="/result">Your Results</a>
-    <a href="/dashboard">view your dashboard</a>
-    <a href="/help">Help & Contact</a>
-</div>
-
+{% block content %}
 <div class="page-container">
 
     <h1 class="page-title">Insights From Data</h1>
     <p class="page-subtitle">
-        These insights summarise what the machine learning models learned from the dataset, 
-        highlighting the strongest predictors of Type 2 diabetes, fairness considerations, 
+        These insights summarise what the machine learning models learned from the dataset,
+        highlighting the strongest predictors of Type 2 diabetes, fairness considerations,
         and clinically meaningful patterns.
     </p>
 
     <div class="card">
         <h2 class="section-title">1. Key Predictors Identified by the Model</h2>
         <p>
-            The XGBoost model consistently identified the following features as the strongest predictors 
+            The XGBoost model consistently identified the following features as the strongest predictors
             of Type 2 diabetes:
         </p>
 
@@ -43,7 +28,7 @@
         </ul>
 
         <p>
-            These findings align with established clinical evidence and support the model’s validity.
+            These findings align with established clinical evidence and support the model's validity.
         </p>
     </div>
 
@@ -66,18 +51,18 @@
         <h2 class="section-title">3. Fairness & Bias Insights</h2>
 
         <p>
-            Fairness analysis revealed differences in recall across demographic groups. 
+            Fairness analysis revealed differences in recall across demographic groups.
             The fairness dashboard highlights:
         </p>
 
         <ul class="insight-list">
             <li><strong>Recall gaps</strong> between ethnic groups.</li>
             <li><strong>False negative disparities</strong> in certain subgroups.</li>
-            <li><strong>Threshold sensitivity</strong> small threshold changes affect fairness.</li>
+            <li><strong>Threshold sensitivity</strong> — small threshold changes affect fairness.</li>
         </ul>
 
         <p>
-            These insights motivated the <strong>Performance vs Fairness Comparison</strong> section, 
+            These insights motivated the <strong>Performance vs Fairness Comparison</strong> section,
             helping identify thresholds that balance accuracy and fairness.
         </p>
     </div>
@@ -92,7 +77,7 @@
         </ul>
 
         <p>
-            These results justify the use of XGBoost in the deployed clinical and non‑clinical pathways.
+            These results justify the use of XGBoost in the deployed clinical and non-clinical pathways.
         </p>
     </div>
 
@@ -104,7 +89,7 @@
         </p>
 
         <ul class="insight-list">
-            <li><strong>Clinically meaningful</strong> — aligned with NHS‑recognised risk factors.</li>
+            <li><strong>Clinically meaningful</strong> — aligned with NHS-recognised risk factors.</li>
             <li><strong>Fair</strong> — evaluated across demographic groups.</li>
             <li><strong>Transparent</strong> — supported by explainability and threshold analysis.</li>
         </ul>
@@ -115,8 +100,4 @@
     </div>
 
 </div>
-
-
-</body>
-</html>
-
+{% endblock %}

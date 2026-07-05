@@ -1,24 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Help & FAQs</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% extends "base.html" %}
+{% set active_page = 'help' %}
+{% block title %}Help & FAQs{% endblock %}
 
-<body>
-
-<div class="navbar">
-    <a href="/">Home</a>
-    <a href="/diabetesinfo">Diabetes Information</a>
-    <a href="/insights">Insights From Data</a>
-    <a href="/lifestyle">Lifestyle Risk Path</a>
-    <a href="/clinical">Clinical Risk Path</a>
-    <a href="/result">Your Results</a>
-    <a href="/dashboard">view your dashboard</a>
-    <a href="/help">Help & Contact</a>
-</div>
-
+{% block content %}
 <div class="container">
     <h1>Help & Frequently Asked Questions</h1>
     <p>Find answers to common questions about how this tool works and what your results mean.</p>
@@ -43,8 +27,8 @@
     <h2>Understanding Your Results</h2>
 
     <section class="info-card">
-        <h3>What does “Low”, “Medium”, or “High” risk mean?</h3>
-        <p>These categories reflect the model’s estimate of your likelihood of having or developing diabetes. They are not diagnostic.</p>
+        <h3>What does "Low", "Medium", or "High" risk mean?</h3>
+        <p>These categories reflect the model's estimate of your likelihood of having or developing diabetes. They are not diagnostic.</p>
     </section>
 
     <section class="info-card">
@@ -53,7 +37,7 @@
     </section>
 
     <section class="info-card">
-        <h3>Why do I see “Clinical Rules Triggered”?</h3>
+        <h3>Why do I see "Clinical Rules Triggered"?</h3>
         <p>Some health indicators, such as very high blood pressure or BMI, are known risk factors. When these appear, the system highlights them for transparency.</p>
     </section>
 
@@ -68,9 +52,5 @@
         <h3>How is my information used?</h3>
         <p>Your inputs are used only to calculate your risk score. No personal information is saved or shared.</p>
     </section>
-
 </div>
-
-
-</body>
-</html>
+{% endblock %}

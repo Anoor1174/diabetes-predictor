@@ -1,70 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Fairness Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% extends "base.html" %}
+{% set active_page = 'dashboard' %}
+{% block title %}Fairness Dashboard{% endblock %}
 
-<body>
+{% block content %}
+<main class="container">
 
-<div class="navbar">
-    <a href="/">Home</a>
-    <a href="/diabetesinfo">Diabetes Information</a>
-    <a href="/insights">Insights From Data</a>
-    <a href="/lifestyle">Lifestyle Risk Path</a>
-    <a href="/clinical">Clinical Risk Path</a>
-    <a href="/result">Your Results</a>
-    <a href="/dashboard">view your dashboard</a>
-    <a href="/help">Help & Contact</a>
-</div>
+    <h1 class="page-title">Diabetes Prediction Fairness Dashboard</h1>
 
+    <!-- Threshold Slider -->
+    <section class="card">
+        <h2>Decision Threshold</h2>
+        <input id="thresholdSlider" type="range" min="0.05" max="0.5" step="0.01" value="0.5" class="slider">
+        <p>Current Threshold: <span id="thresholdValue">0.50</span></p>
+    </section>
 
-    <main class="container">
+    <!-- Metrics Section -->
+    <section class="metrics-grid">
+        <div class="metric-card">
+            <h3>Overall Accuracy</h3>
+            <p id="overallAccuracy" class="metric-value">--</p>
+        </div>
 
-        <h1 class="page-title">Diabetes Prediction Fairness Dashboard</h1>
+        <div class="metric-card">
+            <h3>Overall Recall</h3>
+            <p id="overallRecall" class="metric-value">--</p>
+        </div>
 
-        <!-- Threshold Slider -->
-        <section class="card">
-            <h2>Decision Threshold</h2>
-            <input id="thresholdSlider" type="range" min="0.05" max="0.5" step="0.01" value="0.5" class="slider">
-            <p>Current Threshold: <span id="thresholdValue">0.50</span></p>
-        </section>
+        <div class="metric-card">
+            <h3>Fairness Gap (Recall)</h3>
+            <p id="fairnessGap" class="metric-value">--</p>
+        </div>
+    </section>
 
-        <!-- Metrics Section -->
-        <section class="metrics-grid">
-            <div class="metric-card">
-                <h3>Overall Accuracy</h3>
-                <p id="overallAccuracy" class="metric-value">--</p>
-            </div>
+    <!-- Recall Chart -->
+    <section class="card">
+        <h2>Recall by Ethnicity</h2>
+        <canvas id="recallChart"></canvas>
+    </section>
 
-            <div class="metric-card">
-                <h3>Overall Recall</h3>
-                <p id="overallRecall" class="metric-value">--</p>
-            </div>
+    <!-- Pareto Frontier -->
+    <section class="card">
+        <h2>Pareto Frontier</h2>
+        <canvas id="paretoChart"></canvas>
+    </section>
 
-            <div class="metric-card">
-                <h3>Fairness Gap (Recall)</h3>
-                <p id="fairnessGap" class="metric-value">--</p>
-            </div>
-        </section>
+</main>
+{% endblock %}
 
-        <!-- Recall Chart -->
-        <section class="card">
-            <h2>Recall by Ethnicity</h2>
-            <canvas id="recallChart"></canvas>
-        </section>
-
-        <!-- Pareto Frontier -->
-        <section class="card">
-            <h2>Pareto Frontier</h2>
-            <canvas id="paretoChart"></canvas>
-        </section>
-
-    </main>
-
+{% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
-
-</body>
-</html>
+{% endblock %}

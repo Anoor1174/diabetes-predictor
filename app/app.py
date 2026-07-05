@@ -442,6 +442,12 @@ def insights_page():
     return render_template("insights.html")
 
 
+# Kids Mode — gamified healthy eating page for children
+@app.route("/kids")
+def kids_page():
+    return render_template("kids.html")
+
+
 # Result page reads query string
 @app.route("/result")
 def results_page():

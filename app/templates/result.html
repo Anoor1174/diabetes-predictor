@@ -1,23 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Your Risk Result</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% set active_page = 'result' %}
+{% block title %}Your Risk Result{% endblock %}
 
-<div class="navbar">
-    <a href="/">Home</a>
-    <a href="/diabetesinfo">Diabetes Information</a>
-    <a href="/insights">Insights From Data</a>
-    <a href="/lifestyle">Lifestyle Risk Path</a>
-    <a href="/clinical">Clinical Risk Path</a>
-    <a href="/result" class="active">Your Results</a>
-    <a href="/dashboard">View Dashboard</a>
-    <a href="/help">Help & Contact</a>
-</div>
-
+{% block content %}
 {% set pct = ((risk_score|float) * 100)|round(1) %}
 {% set category = 'risk-low' %}
 {% set category_word = 'LOW' %}
@@ -73,9 +58,10 @@
 
     <a href="/">Back to Home</a>
 </div>
+{% endblock %}
 
+{% block extra_scripts %}
 <script>
-    // Animate the percentage count-up and bar fill on load
     const fillEl = document.getElementById('riskFill');
     const textEl = document.getElementById('riskPercentText');
     const target = parseFloat(fillEl.dataset.target) || 0;
@@ -94,6 +80,4 @@
     }
     requestAnimationFrame(tick);
 </script>
-
-</body>
-</html>
+{% endblock %}

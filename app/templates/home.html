@@ -1,24 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Diabetes Health Checker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% set active_page = 'home' %}
+{% block title %}Diabetes Health Checker{% endblock %}
 
-<div class="navbar">
-    <a href="/">Home</a>
-    <a href="/diabetesinfo">Diabetes Information</a>
-    <a href="/insights">Insights From Data</a>
-    <a href="/lifestyle">Lifestyle Risk Path</a>
-    <a href="/clinical">Clinical Risk Path</a>
-    <a href="/result">Your Results</a>
-    <a href="/dashboard">view your dashboard</a>
-    <a href="/help">Help & Contact</a>
-</div>
-
-
+{% block content %}
 <div class="container">
     <h1>Diabetes Health Checker</h1>
     <p>This tool provides a statistical estimate of diabetes risk. It is not a diagnosis.</p>
@@ -28,18 +12,17 @@
             <h2>Clinical Assessment</h2>
             <p>Based on blood pressure, BMI, and demographics.</p>
         </a>
-    </div>
-
-    <div class="card-grid">
         <a class="card" href="/lifestyle">
             <h2>Lifestyle Assessment</h2>
-            <p>Based on blood pressure, BMI, and demographics.</p>
+            <p>Based on lifestyle habits and family history.</p>
         </a>
     </div>
 
-
+    <div style="margin-top: 40px; text-align: center;">
+        <p class="page-subtitle" style="margin: 0 auto 14px;">
+            Got kids? Try the fun, game-based version built to help children understand healthy eating.
+        </p>
+        <a class="kids-mode-btn" href="/kids">🌈 Kids Mode 🌈</a>
+    </div>
 </div>
-
-</body>
-</html>
-
+{% endblock %}
